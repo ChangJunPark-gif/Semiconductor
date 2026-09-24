@@ -27,3 +27,14 @@ $python = Join-Path $env:USERPROFILE '.cache/codex-runtimes/codex-primary-runtim
 ```
 
 결과와 사례 선정 기준은 [2단계 보고서](reports/step2_visualization.md)에 기록합니다.
+
+## 3단계 · Moran's I와 공간 자기상관
+
+유효 die의 상하좌우 이웃을 기준으로 전체 wafer의 Moran's I를 계산하고, 라벨별로 선정한 사례에 조건부 permutation 검정을 적용합니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m src.spatial.step3_moran
+```
+
+수치, 검정 범위와 해석상 주의점은 [3단계 보고서](reports/step3_moran.md)에 기록합니다. wafer별 전체 결과 CSV는 `data/processed/`에만 보관합니다.

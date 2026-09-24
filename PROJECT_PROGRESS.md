@@ -6,7 +6,7 @@
 | :--- | :--- | :--- |
 | 1. Yield 및 bin distribution | **완료** | [데이터 품질·수율 보고서](reports/data_report.md), [분석 코드](src/data/step1_yield.py) |
 | 2. Wafer spatial visualization | **완료** | [공간 시각화 보고서](reports/step2_visualization.md), [그림 생성 코드](src/data/step2_visualize.py) |
-| 3. Moran's I | 대기 | — |
+| 3. Moran's I | **완료** | [공간 자기상관 보고서](reports/step3_moran.md), [전체 계산 코드](src/spatial/step3_moran.py), [검증](tests/test_step3_spatial.py) |
 | 4. PCA / feature engineering | 대기 | — |
 | 5. DBSCAN / HDBSCAN | 대기 | — |
 | 6. CNN / ViT classification | 대기 | — |
