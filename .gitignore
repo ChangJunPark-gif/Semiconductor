@@ -1,0 +1,14 @@
+# Public wafer datasets and generated artifacts
+data/
+artifacts/
+checkpoints/
+*.pkl
+*.parquet
+*.pt
+*.pth
+
+# Python and local configuration
+__pycache__/
+.pytest_cache/
+.venv/
+.env
