@@ -50,3 +50,15 @@ $python = Join-Path $env:USERPROFILE '.cache/codex-runtimes/codex-primary-runtim
 ```
 
 실제 결과와 한계는 [4단계 보고서](reports/step4_features_pca.md), 각 변수의 정의는 [특징 사전](reports/feature_dictionary.md)에 있습니다. 전체 특징 CSV·PCA 임베딩·변환기는 `data/processed/`에 저장하며 Git에는 올리지 않습니다.
+
+## 5단계 · DBSCAN과 HDBSCAN 군집
+
+학습 lot의 wafer 12,000장을 고정 시드로 추출해 9차원 PCA 공간에서 밀도 기반 군집을 비교합니다. 설정별 군집 수·noise 비율·안정성, 기존 라벨 교차표, 대표 wafer map을 기록합니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-step5.txt
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m src.clustering.step5_cluster
+```
+
+[5단계 보고서](reports/step5_clustering.md)에 실제 결과와 한계를 정리했습니다. 웨이퍼별 군집 할당 파일은 `data/processed/`에만 보관합니다.

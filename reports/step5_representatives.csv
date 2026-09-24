@@ -1,0 +1,9 @@
+cluster,role,source_row,lot_id,failure_type,yield
+2,central,188026,lot11974,unlabeled,0.9595417114214106
+2,outer,117946,lot7872,unlabeled,0.8093716719914803
+0,central,8821,lot1671,unlabeled,1.0
+0,outer,341961,lot20505,unlabeled,0.0
+1,central,192427,lot12174,unlabeled,0.9991575400168492
+1,outer,40735,lot3576,unlabeled,0.0083572110792741
+3,central,497568,lot30920,unlabeled,0.998678122934567
+3,outer,524114,lot32774,unlabeled,0.996116504854369
