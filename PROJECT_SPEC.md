@@ -45,7 +45,7 @@
 
 | 구분 | 명세 |
 | :--- | :--- |
-| **데이터셋** | 실제 제조 환경에서 수집된 WM-811K: wafer map 811,457개, lot 46,393개. 공개 파일 `LSWMD.pkl` 약 2.1GB. [데이터 카드](https://www.kaggle.com/datasets/qingyi/wm811k-wafer-map/metadata) |
+| **데이터셋** | 실제 제조 환경에서 수집된 WM-811K: wafer map 811,457개. 원본을 읽어 확인한 고유 lot은 46,293개다. 공개 파일 `LSWMD.pkl` 약 2.1GB. [데이터 카드](https://www.kaggle.com/datasets/qingyi/wm811k-wafer-map/metadata) |
 | **패턴 라벨** | 일부 샘플에 Center, Donut, Edge-Loc, Edge-Ring, Loc, Random, Scratch, Near-full, none 등이 있다. 실제 라벨 분포는 다운로드 후 검증한다. |
 | **원본 필드** | `waferMap`, `lotName`, `waferIndex`, `trianTestLabel`/`failureType` 등 실제 필드명과 값 타입을 먼저 확인한다. |
 | **표준 스키마** | `wafer_id`, `lot_id`, `wafer_index`, `map_shape`, `die_state`, `pattern_label`, `split`. 원본→표준 변환 규칙을 기록한다. |
