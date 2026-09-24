@@ -1,11 +1,41 @@
-# 웨이퍼 수율·불량 패턴 분석 및 신규 패턴 탐지 프로젝트 명세서
+# 웨이퍼 수율·불량 패턴 분석
 
-## 1. 프로젝트 개요
+> **프로젝트 명세서 · v1.0**
+>
+> Wafer bin map에서 수율과 공간 패턴을 분석하고, 알려진 패턴을 분류하며, 새로운 패턴을 검토 대상으로 선별한다.
 
-- **목적:** wafer bin map의 수율과 공간 패턴을 정량화하고, 알려진 패턴을 분류하며, 학습하지 않은 패턴을 엔지니어 검토 대상으로 올리는 분석 파이프라인을 만든다.
-- **대상 직무:** 반도체 전공정 공정/수율 엔지니어. 결과를 공정 이상 조사에 사용할 수 있도록 수율 변화, 위치, 반복성, 불확실성을 함께 보여준다.
-- **핵심 질문:** 수율이 낮은 웨이퍼의 fail die가 무작위로 흩어졌는가? 특정 공간 패턴이 반복되는가? 기존 패턴 분류기가 설명하지 못하는 새 형태인가?
-- **최종 산출물:** 재현 가능한 코드와 실행 방법, 데이터 품질 보고서, wafer map 시각화, 통계·군집·분류·OOD 성능 보고서, 엔지니어 검토용 사례 카드 5개 이상.
+| 항목 | 내용 |
+| :--- | :--- |
+| **목표 직무** | 반도체 전공정 공정·수율 엔지니어 |
+| **주요 데이터** | WM-811K wafer bin map |
+| **핵심 분석** | 수율 → 공간 시각화 → Moran's I → 특징/PCA → 군집 → 분류 → OOD |
+| **최종 결과물** | 재현 가능한 코드, 분석 보고서, 모델 평가, 엔지니어 검토 사례 카드 |
+| **예상 기간** | 8주 · CNN 중심 MVP부터 구현 |
+
+### 목차
+
+- [프로젝트 목표](#1-프로젝트-목표)
+- [데이터와 해석 범위](#2-데이터와-해석-범위)
+- [사용자 시나리오](#3-사용자-시나리오)
+- [분석 파이프라인](#4-분석-파이프라인)
+- [실험 설계](#5-실험-설계와-누출-방지)
+- [기술 구성](#6-기술-구성과-저장소-구조)
+- [일정과 우선순위](#7-우선순위와-일정예상-8주)
+- [완료 기준](#8-성공-기준과-포트폴리오-표현)
+
+---
+
+## 1. 프로젝트 목표
+
+**만들 것:** wafer bin map의 수율과 공간 패턴을 정량화하고, 알려진 패턴을 분류하며, 학습하지 않은 패턴을 엔지니어 검토 대상으로 올리는 분석 파이프라인.
+
+**답할 질문**
+
+1. 수율이 낮은 웨이퍼의 fail die는 무작위로 흩어졌는가?
+2. 같은 형태의 공간 패턴이 여러 wafer 또는 lot에서 반복되는가?
+3. 기존 분류기가 설명하지 못하는 새로운 형태인가?
+
+**최종 산출물:** 실행 가능한 코드와 재현 방법, 데이터 품질 보고서, wafer map 시각화, 통계·군집·분류·OOD 평가 보고서, 엔지니어 검토용 사례 카드 5개 이상.
 
 이 프로젝트는 참고 논문의 모델 수치를 재현하는 과제가 아니다. 논문의 분류 모델 비교를 출발점으로 삼되, 통계적 공간 분석과 미지 패턴 탐지까지 연결하는 독립적인 분석 프로젝트다. 참고 논문은 ResNet/CNN 등의 성능과 계산 비용·일반화 한계를 논의한다. 논문에 인용된 최고 정확도를 이 프로젝트의 목표치로 사용하지 않는다. [참고 논문](https://link.springer.com/article/10.1007/s10845-024-02521-0)
 
@@ -13,14 +43,23 @@
 
 ### 2.1 1차 데이터
 
-- **WM-811K:** 실제 제조 환경에서 수집된 wafer map 811,457개, lot 46,393개를 포함한다. 공개 파일 `LSWMD.pkl`은 약 2.1GB이며, Center, Donut, Edge-Loc, Edge-Ring, Loc, Random, Scratch, Near-full, none 등의 패턴 라벨이 일부 샘플에 있다. 원본 데이터와 라벨 분포는 다운로드 후 검증하여 `data_report.md`에 기록한다. [데이터 카드](https://www.kaggle.com/datasets/qingyi/wm811k-wafer-map/metadata)
-- **필수 필드:** `waferMap`, `lotName`, `waferIndex`, `trianTestLabel`/`failureType` 등 실제 파일의 필드명을 먼저 검사한다. 분석용 표준 스키마는 `wafer_id`, `lot_id`, `wafer_index`, `map_shape`, `die_state`, `pattern_label`, `split`로 변환한다. 원본 필드명과 변환 규칙을 문서화한다.
-- **값 정의:** dataset의 die 상태 코드를 확인하고 `outside`, `pass`, `fail`로 매핑한다. wafer 바깥과 측정되지 않은 die를 pass로 세지 않는다. 유효 die가 0개이거나 map이 손상된 샘플은 제외 목록에 남긴다.
-- **저장:** 원본 2.1GB 파일, 변환 데이터, 모델 가중치는 Git에 올리지 않는다. 다운로드·전처리 스크립트와 체크섬, 사용 조건, 버전 정보만 저장한다.
+| 구분 | 명세 |
+| :--- | :--- |
+| **데이터셋** | 실제 제조 환경에서 수집된 WM-811K: wafer map 811,457개, lot 46,393개. 공개 파일 `LSWMD.pkl` 약 2.1GB. [데이터 카드](https://www.kaggle.com/datasets/qingyi/wm811k-wafer-map/metadata) |
+| **패턴 라벨** | 일부 샘플에 Center, Donut, Edge-Loc, Edge-Ring, Loc, Random, Scratch, Near-full, none 등이 있다. 실제 라벨 분포는 다운로드 후 검증한다. |
+| **원본 필드** | `waferMap`, `lotName`, `waferIndex`, `trianTestLabel`/`failureType` 등 실제 필드명과 값 타입을 먼저 확인한다. |
+| **표준 스키마** | `wafer_id`, `lot_id`, `wafer_index`, `map_shape`, `die_state`, `pattern_label`, `split`. 원본→표준 변환 규칙을 기록한다. |
+| **die 상태** | 실제 코드를 검사하여 `outside`, `pass`, `fail`로 매핑한다. 바깥/미측정 die는 pass로 세지 않는다. 유효 die가 0개이거나 map이 손상된 샘플은 제외 목록에 남긴다. |
+| **저장 정책** | 원본·변환 데이터와 모델 가중치는 Git에서 제외한다. 다운로드·전처리 코드, 체크섬, 사용 조건과 버전만 저장한다. |
+
+검증 결과와 실제 라벨 분포는 `data_report.md`에 남긴다.
 
 ### 2.2 해석의 한계
 
-WM-811K는 최종 전기적 테스트 결과를 공간적으로 나타낸 bin map이다. **전공정의 특정 장비·공정 단계·레시피가 원인이라고 이 데이터만으로 단정할 수 없다.** 패턴과 수율은 원인 조사 우선순위를 만드는 신호다. 실제 원인 검증에는 공정 이력, 장비·챔버, lot/시간 순서, 계측/검사 데이터, 수리 이력과 전문가 확인이 필요하다. 분류 결과는 “원인” 대신 “관찰된 패턴”으로 표현한다.
+> [!IMPORTANT]
+> WM-811K는 최종 전기적 테스트 결과를 공간적으로 나타낸 bin map이다. **이 데이터만으로 전공정의 특정 장비·공정 단계·레시피를 불량 원인으로 단정할 수 없다.**
+
+패턴과 수율은 원인 조사 우선순위를 만드는 신호다. 실제 원인 검증에는 공정 이력, 장비·챔버, lot/시간 순서, 계측·검사 데이터와 전문가 확인이 필요하다. 분류 결과는 “원인” 대신 **“관찰된 패턴”**으로 표현한다.
 
 ## 3. 사용자 시나리오
 
@@ -30,17 +69,63 @@ WM-811K는 최종 전기적 테스트 결과를 공간적으로 나타낸 bin ma
 4. 분류기는 알려진 패턴의 예측과 확신도를 표시한다. OOD 탐지기가 임계값을 넘긴 경우 분류 결과를 확정하지 않고 `검토 필요`로 표시한다.
 5. 사례 카드에는 wafer/lot 식별자, 수율, 공간 통계, 유사 map, 모델 출력, 가능한 조사 방향과 **검증에 필요한 추가 데이터**를 적는다.
 
-## 4. 분석 단계와 완료 기준
+## 4. 분석 파이프라인
 
-| 단계 | 구현 내용 | 산출물·완료 기준 |
-| --- | --- | --- |
-| **1. Yield 및 bin distribution** | `yield = pass / (pass + fail)`을 wafer 단위로 계산한다. 결측/무효 die는 분모에서 제외하고 유효 die 수를 함께 표시한다. lot별 수율 분포, 클래스별 수율, fail die 비율과 결측 비율을 분석한다. 실제 데이터에 다중 bin 코드가 있으면 bin별 비율을 추가한다. | `data_report.md`, wafer/lot 수율 표. 분모·상태 매핑을 샘플 수작업 검산으로 확인한다. |
-| **2. Spatial visualization** | 원래 격자를 유지한 wafer map을 `outside/pass/fail`로 색상 분리한다. wafer 크기별 패싯, lot 내 wafer 순서, 패턴별 대표/경계 사례를 그린다. 분류 입력을 리사이즈할 때는 nearest-neighbor와 유효 영역 mask를 사용한다. | 재현 가능한 시각화 스크립트와 10개 이상 사례. 바깥 영역이 fail처럼 표시되지 않는지 확인한다. |
-| **3. Moran's I** | 유효 die만 노드로 사용해 4방향 인접 그래프를 만들고, fail 지표의 global Moran's I를 계산한다. 단일 상태만 있는 wafer는 통계량을 `undefined`로 처리한다. wafer별 fail 비율·격자 크기에 따른 기준 차이를 보정하기 위해 동일 mask와 fail 개수를 고정한 999회 permutation의 귀무분포를 비교한다. 이진 자료에 적합한 join-count 통계도 보조 지표로 비교한다. | Moran's I, permutation p-value, null 분포와 공간 지표 요약표. `p<0.05`만으로 원인을 확정하지 않는다. [PySAL Moran 가이드](https://pysal.org/esda/stable/user-guide/global_morans_i.html), [PySAL 공간 통계 선택 가이드](https://pysal.org/esda/dev/user-guide/global.html) |
-| **4. PCA / feature engineering** | wafer별 특징을 만든다: yield, fail 비율, edge/center fail 비율, 반경 구간별 fail 비율, 사분면 비대칭, 연결 성분 수·최대 크기, Moran's I와 귀무분포 대비 z-score. 학습 세트로만 결측 처리·표준화·PCA를 적합한다. PCA는 군집용 차원 축소와 해석용 적재량 확인에 사용한다. | 특징 사전, train에 적합한 전처리 파이프라인, PCA 설명 분산과 주요 적재량. 단순 yield만으로 군집이 갈리는지 점검한다. |
-| **5. DBSCAN / HDBSCAN clustering** | wafer 단위 특징 공간에서 군집화한다. DBSCAN을 기준선으로, HDBSCAN을 가변 밀도 대안으로 비교한다. 군집 대표 map과 내부 다양성, noise 비율, 기존 라벨과의 교차표를 검토한다. 임베딩이 아니라 2D 시각화 좌표에서 군집하지 않는다. | 군집 요약표와 대표 map 갤러리. seed/하이퍼파라미터 변화에 대한 군집 안정성, 지나친 noise 또는 단일 군집 여부를 기록한다. noise를 곧바로 새 패턴으로 간주하지 않는다. |
-| **6. CNN / ViT classification** | 라벨이 있는 wafer에 대해 간단한 CNN 또는 ResNet 계열을 주 모델로 학습한다. 특성 기반 XGBoost/로지스틱 회귀를 해석 가능한 기준선으로 둔다. ViT는 데이터·연산 자원이 허용되면 비교 실험으로 추가한다. 훈련 데이터에만 클래스 가중치/증강을 적용하고, 회전·반전이 물리적으로 허용되는지 명시한다. | 테스트 macro-F1, 클래스별 precision/recall, confusion matrix, 추론 시간. 다수 클래스 정확도만 보고 성공으로 판단하지 않는다. 라벨 불균형과 모델별 학습 조건을 함께 공개한다. |
-| **7. OOD 탐지** | 알려진 클래스 일부를 학습에서 완전히 제외하는 `leave-one-class-out` 실험을 반복한다. 주 모델의 임베딩 kNN 거리 또는 Mahalanobis 거리로 novelty score를 만들고, softmax 최대 확률을 기준선으로 비교한다. 임계값은 validation 세트에서만 결정한다. | 보류 클래스별 AUROC, AUPR, FPR@95% TPR, 알려진 클래스의 오경보율, 사례 시각화. 군집 noise와 OOD 점수를 별도 결과로 보고한다. [kNN OOD 원 논문](https://arxiv.org/abs/2204.06507) |
+```mermaid
+flowchart LR
+    A["① 수율·bin 분포"] --> B["② 공간 시각화"]
+    B --> C["③ Moran's I"]
+    C --> D["④ 특징 추출·PCA"]
+    D --> E["⑤ DBSCAN·HDBSCAN"]
+    E --> F["⑥ CNN·ViT 분류"]
+    F --> G["⑦ OOD 탐지"]
+    G --> H["엔지니어 검토 사례"]
+```
+
+| 단계 | 핵심 질문 | 주요 결과 |
+| :--- | :--- | :--- |
+| 01 · 수율 | 얼마나 많은 유효 die가 통과했는가? | wafer/lot 수율, bin 분포 |
+| 02 · 시각화 | fail die가 어디에 있는가? | wafer map 갤러리 |
+| 03 · 공간 통계 | 분포가 무작위와 다른가? | Moran's I, permutation 검정 |
+| 04 · 특징 | 패턴을 어떻게 수치화할까? | 특징 사전, PCA |
+| 05 · 군집 | 비슷한 wafer가 모이는가? | 대표 map, noise·안정성 |
+| 06 · 분류 | 알려진 패턴을 구별하는가? | 클래스별 성능·오류 사례 |
+| 07 · OOD | 학습하지 않은 패턴을 걸러내는가? | 신규 패턴 후보·오경보율 |
+
+### 01. Yield 및 bin distribution
+
+- **구현:** wafer별 `yield = pass / (pass + fail)`. 결측·무효 die는 분모에서 제외하고 유효 die 수를 함께 표시한다. lot별·패턴별 수율, fail die 비율, 결측 비율을 분석한다. 다중 bin 코드가 있으면 bin별 비율도 계산한다.
+- **완료 기준:** `data_report.md`와 wafer/lot 수율 표. 샘플을 수작업으로 계산해 상태 매핑과 분모를 검산한다.
+
+### 02. Wafer spatial visualization
+
+- **구현:** 원래 격자를 유지하고 `outside/pass/fail`을 구분한다. wafer 크기, lot 내 wafer 순서, 패턴별 대표·경계 사례를 비교한다. 모델 입력 리사이즈에는 nearest-neighbor와 유효 영역 mask를 사용한다.
+- **완료 기준:** 재현 가능한 시각화 스크립트와 사례 10개 이상. 바깥 영역이 fail로 표시되지 않아야 한다.
+
+### 03. Moran's I: spatial autocorrelation
+
+- **구현:** 유효 die의 4방향 인접 그래프에서 fail 지표의 global Moran's I를 계산한다. 단일 상태 wafer는 `undefined`로 기록한다. 동일 mask와 fail 개수를 고정한 999회 permutation으로 wafer별 귀무분포와 비교한다. 이진 자료용 join-count 통계도 함께 본다.
+- **완료 기준:** Moran's I, permutation p-value, 귀무분포와 공간 지표 표. `p<0.05`만으로 원인을 확정하지 않는다. [Moran 가이드](https://pysal.org/esda/stable/user-guide/global_morans_i.html) · [공간 통계 선택 가이드](https://pysal.org/esda/dev/user-guide/global.html)
+
+### 04. PCA / feature engineering
+
+- **구현:** yield, fail 비율, edge/center 및 반경 구간별 fail 비율, 사분면 비대칭, 연결 성분 수·최대 크기, Moran's I와 귀무분포 대비 z-score를 wafer별 특징으로 만든다. 결측 처리·표준화·PCA는 train 데이터에만 적합한다.
+- **완료 기준:** 특징 사전, 전처리 파이프라인, PCA 설명 분산·주요 적재량. 군집이 단순 yield 차이만 반영하는지 점검한다.
+
+### 05. DBSCAN / HDBSCAN clustering
+
+- **구현:** wafer별 특징 공간에서 DBSCAN과 HDBSCAN을 비교한다. 군집 대표 map, 내부 다양성, noise 비율, 기존 라벨과의 교차표를 살핀다. 2D 그림용 좌표를 군집 입력으로 재사용하지 않는다.
+- **완료 기준:** 군집 요약표와 대표 map 갤러리. 하이퍼파라미터 변화에 대한 안정성, 지나친 noise·단일 군집 여부를 기록한다. noise는 곧바로 새 패턴이 아니다.
+
+### 06. CNN / ViT classification
+
+- **구현:** 라벨이 있는 wafer로 CNN 또는 ResNet을 주 모델로 학습한다. 특징 기반 XGBoost/로지스틱 회귀를 기준선으로 둔다. ViT는 데이터와 연산 자원이 허용될 때 비교한다. 클래스 가중치·증강은 train에만 적용하고 회전·반전의 물리적 타당성을 명시한다.
+- **완료 기준:** 테스트 macro-F1, 클래스별 precision/recall, confusion matrix, 추론 시간과 오류 사례. 다수 클래스 정확도만 보고 성공으로 판단하지 않는다.
+
+### 07. 새로운 패턴의 OOD 탐지
+
+- **구현:** 패턴 클래스를 통째로 학습에서 제외하는 `leave-one-class-out` 평가를 반복한다. 임베딩 kNN 거리 또는 Mahalanobis 거리를 novelty score로 사용하고, 최대 softmax 확률을 기준선으로 비교한다. 임계값은 validation에서만 결정한다.
+- **완료 기준:** 보류 클래스별 AUROC, AUPR, FPR@95% TPR, 알려진 클래스 오경보율과 사례 그림. 군집 noise와 OOD 점수는 별도로 보고한다. [kNN OOD 원 논문](https://arxiv.org/abs/2204.06507)
 
 ## 5. 실험 설계와 누출 방지
 
