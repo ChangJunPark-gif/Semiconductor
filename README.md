@@ -17,3 +17,13 @@ $python = Join-Path $env:USERPROFILE '.cache/codex-runtimes/codex-primary-runtim
 ```
 
 분석 결과는 [1단계 보고서](reports/data_report.md)에 정리합니다. wafer별·lot별 CSV 원본은 `data/processed/`에 저장하며 Git에는 올리지 않습니다.
+
+## 2단계 · wafer 공간 시각화
+
+1단계 실행 후 다음 명령으로 패턴별 대표 wafer, 저수율 wafer, lot 내 wafer 순서 그림을 만듭니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m src.data.step2_visualize
+```
+
+결과와 사례 선정 기준은 [2단계 보고서](reports/step2_visualization.md)에 기록합니다.

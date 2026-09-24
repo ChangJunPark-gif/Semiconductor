@@ -5,7 +5,7 @@
 | 단계 | 상태 | 검증 가능한 결과 |
 | :--- | :--- | :--- |
 | 1. Yield 및 bin distribution | **완료** | [데이터 품질·수율 보고서](reports/data_report.md), [분석 코드](src/data/step1_yield.py) |
-| 2. Wafer spatial visualization | 대기 | — |
+| 2. Wafer spatial visualization | **완료** | [공간 시각화 보고서](reports/step2_visualization.md), [그림 생성 코드](src/data/step2_visualize.py) |
 | 3. Moran's I | 대기 | — |
 | 4. PCA / feature engineering | 대기 | — |
 | 5. DBSCAN / HDBSCAN | 대기 | — |
