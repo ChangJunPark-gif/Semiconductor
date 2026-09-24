@@ -1,0 +1,11 @@
+failure_type,test,train,validation
+Center,627,2944,723
+Donut,87,365,103
+Edge-Loc,796,3683,710
+Edge-Ring,1248,6762,1670
+Loc,558,2534,501
+Near-full,21,93,35
+Random,130,618,118
+Scratch,193,834,166
+none,22572,103785,21074
+unlabeled,96144,446205,96158

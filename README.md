@@ -38,3 +38,15 @@ $python = Join-Path $env:USERPROFILE '.cache/codex-runtimes/codex-primary-runtim
 ```
 
 수치, 검정 범위와 해석상 주의점은 [3단계 보고서](reports/step3_moran.md)에 기록합니다. wafer별 전체 결과 CSV는 `data/processed/`에만 보관합니다.
+
+## 4단계 · 공간 특징과 PCA
+
+전체 wafer의 공간 특징을 추출하고 lot 단위로 train/validation/test를 나눕니다. 결측 대체·표준화·PCA는 train에만 적합합니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-step4.txt
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m src.features.step4_features
+```
+
+실제 결과와 한계는 [4단계 보고서](reports/step4_features_pca.md), 각 변수의 정의는 [특징 사전](reports/feature_dictionary.md)에 있습니다. 전체 특징 CSV·PCA 임베딩·변환기는 `data/processed/`에 저장하며 Git에는 올리지 않습니다.
