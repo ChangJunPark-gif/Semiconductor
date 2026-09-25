@@ -62,3 +62,15 @@ $python = Join-Path $env:USERPROFILE '.cache/codex-runtimes/codex-primary-runtim
 ```
 
 [5단계 보고서](reports/step5_clustering.md)에 실제 결과와 한계를 정리했습니다. 웨이퍼별 군집 할당 파일은 `data/processed/`에만 보관합니다.
+
+## 6단계 · 결함 패턴 분류
+
+결함 라벨 8종을 lot 분할을 유지한 채 CNN과 공간 특징 로지스틱 회귀로 분류합니다. 원본 map의 분할 간 완전 중복은 평가에서 제거합니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-step6.txt
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m src.models.step6_classify
+```
+
+Macro-F1, 클래스별 precision/recall, confusion matrix, 오류 사례와 한계는 [6단계 보고서](reports/step6_classification.md)에 있습니다. 이미지 캐시와 모델 체크포인트는 `data/processed/`에만 보관합니다.
