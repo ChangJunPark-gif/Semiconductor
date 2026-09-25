@@ -74,3 +74,15 @@ $python = Join-Path $env:USERPROFILE '.cache/codex-runtimes/codex-primary-runtim
 ```
 
 Macro-F1, 클래스별 precision/recall, confusion matrix, 오류 사례와 한계는 [6단계 보고서](reports/step6_classification.md)에 있습니다. 이미지 캐시와 모델 체크포인트는 `data/processed/`에만 보관합니다.
+
+## 7단계 · 신규 패턴 OOD 탐지
+
+결함 라벨 8종을 하나씩 학습에서 제외하고, 보류 유형의 test wafer를 신규 패턴으로 간주합니다. 학습 데이터의 클래스별 Mahalanobis 거리와 분류기의 최대 softmax 확률을 비교하고, 알려진 유형 validation 데이터만으로 경보 임계값을 정합니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-step7.txt
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m src.evaluation.step7_ood
+```
+
+보류 유형별 AUROC·AUPR·FPR@95% TPR·고정 임계값 경보율과 한계는 [7단계 보고서](reports/step7_ood.md)에 있습니다. 특히 보류 유형 탐지율이 낮은 경우가 있어 실제 공정 경보로 바로 사용할 수 없습니다.
