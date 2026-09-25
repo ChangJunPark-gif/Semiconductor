@@ -4,6 +4,10 @@
 
 구현 범위와 평가 기준은 [프로젝트 명세서](PROJECT_SPEC.md)를 참고하세요.
 
+**결과부터 보기:** [포트폴리오 요약](PORTFOLIO_SUMMARY.md) · [공정 검토 사례 카드](reports/portfolio_case_cards.md) · [면접 발표 구성](PRESENTATION.md) · [진행 현황](PROJECT_PROGRESS.md)
+
+결함 8종의 동일 lot 분할 테스트에서 수율만 사용한 모델의 macro-F1은 **0.318**, 공간 특징 모델은 **0.755**, CNN은 **0.734**였습니다. 보류 유형 OOD 탐지는 평균 AUROC **0.780**이었지만, 검증 세트 임계값에서 평균 탐지율은 **36.5%**였습니다. 이 결과를 실제 공정 원인 규명이나 수율 개선 효과로 해석하지 않습니다.
+
 ## 1단계 · 데이터 품질과 수율·bin 분포
 
 원본 [WM-811K](https://www.kaggle.com/datasets/qingyi/wm811k-wafer-map)를 내려받아 `data/raw/LSWMD.pkl`에 둡니다. 이 컴퓨터의 Codex Python 환경에서 Windows PowerShell로 다음을 실행합니다.
@@ -86,3 +90,13 @@ Macro-F1, 클래스별 precision/recall, confusion matrix, 오류 사례와 한�
 ```
 
 보류 유형별 AUROC·AUPR·FPR@95% TPR·고정 임계값 경보율과 한계는 [7단계 보고서](reports/step7_ood.md)에 있습니다. 특히 보류 유형 탐지율이 낮은 경우가 있어 실제 공정 경보로 바로 사용할 수 없습니다.
+
+## 8단계 · 최종 결과와 포트폴리오
+
+같은 분할에서 수율만 사용한 기준선을 평가하고, 공간 특징·CNN 결과와 비교합니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m src.evaluation.step8_yield_baseline
+```
+
+[포트폴리오 요약](PORTFOLIO_SUMMARY.md), [사례 카드](reports/portfolio_case_cards.md), [발표 구성](PRESENTATION.md)에 관찰·한계·후속 공정 검증 항목을 정리했습니다.
