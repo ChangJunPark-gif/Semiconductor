@@ -2,6 +2,8 @@
 
 웨이퍼 수율·공간 패턴 분석과 신규 패턴 탐지를 위한 프로젝트입니다.
 
+**웹사이트:** [Wafer Signal Lab — GitHub Pages](https://changjunpark-gif.github.io/Semiconductor/)
+
 구현 범위와 평가 기준은 [프로젝트 명세서](PROJECT_SPEC.md)를 참고하세요.
 
 **결과부터 보기:** [포트폴리오 요약](PORTFOLIO_SUMMARY.md) · [공정 검토 사례 카드](reports/portfolio_case_cards.md) · [면접 발표 구성](PRESENTATION.md) · [진행 현황](PROJECT_PROGRESS.md)
