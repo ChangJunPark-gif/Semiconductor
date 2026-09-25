@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#081d2c">
+  <meta name="description" content="WM-811K 웨이퍼 맵 81만 장으로 수율, 공간 패턴, 결함 분류와 신규 패턴 탐지를 분석한 반도체 공정 포트폴리오">
+  <title>Wafer Signal Lab | 웨이퍼 수율·공간 패턴 분석</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">본문 바로가기</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="주요 메뉴">
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span><span>WAFER<span class="brand-light">/SIGNAL</span></span></a>
+      <div class="nav-links">
+        <a href="#approach">분석 흐름</a>
+        <a href="#results">핵심 결과</a>
+        <a href="#cases">사례</a>
+        <a href="#limits">해석 범위</a>
+      </div>
+      <a class="nav-github" href="https://github.com/ChangJunPark-gif/Semiconductor" target="_blank" rel="noopener noreferrer" aria-label="GitHub 저장소 새 창에서 열기">GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section id="top" class="hero">
+      <div class="hero-grid wrap">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> SEMICONDUCTOR · DATA PORTFOLIO</p>
+          <h1>웨이퍼 맵에서<br><em>공정 검토 신호</em>까지</h1>
+          <p class="hero-description">수율 숫자 하나로 놓치기 쉬운 공간 결함을 정량화했습니다. 알려진 패턴을 분류하고, 처음 보는 패턴을 얼마나 안정적으로 경보할 수 있는지 검증했습니다.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#results">결과 살펴보기 <span aria-hidden="true">↗</span></a>
+            <a class="button button-secondary" href="https://github.com/ChangJunPark-gif/Semiconductor/blob/main/PORTFOLIO_SUMMARY.md" target="_blank" rel="noopener noreferrer">분석 문서 보기</a>
+          </div>
+          <p class="hero-note">공개 WM-811K 기반 연구 프로젝트 · 실제 공정 원인 및 수율 개선 효과는 검증하지 않았습니다.</p>
+        </div>
+        <div class="hero-visual" aria-label="웨이퍼 맵을 형상화한 장식 그림" role="img">
+          <div class="wafer-stage">
+            <div class="wafer-disc" aria-hidden="true"></div>
+            <div class="wafer-cross wafer-cross-h" aria-hidden="true"></div>
+            <div class="wafer-cross wafer-cross-v" aria-hidden="true"></div>
+            <div class="visual-callout callout-top"><span class="callout-dot orange"></span> EDGE PATTERN <strong>0.290</strong><small>Moran's I median</small></div>
+            <div class="visual-callout callout-bottom"><span class="callout-dot mint"></span> SPATIAL FEATURES <strong>11</strong><small>PCA input variables</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-stats wrap" aria-label="프로젝트 규모">
+        <div><strong>811,457<span>장</span></strong><span>분석한 wafer map</span></div>
+        <div><strong>46,293<span>개</span></strong><span>고유 lot</span></div>
+        <div><strong>7<span>단계</span></strong><span>수율부터 OOD까지</span></div>
+        <div><strong>8<span>유형</span></strong><span>결함 분류 평가</span></div>
+      </div>
+    </section>
+
+    <section id="approach" class="section section-light">
+      <div class="wrap">
+        <div class="section-heading"><div><p class="section-kicker">01 / APPROACH</p><h2>수율에서 신규성 평가까지</h2></div><p>각 단계의 계산 결과를 다음 단계의 입력으로 연결하고, lot 기준 분할로 평가 데이터 누출을 줄였습니다.</p></div>
+        <div class="pipeline" aria-label="분석 파이프라인">
+          <article><span class="step-no">01</span><h3>수율·bin</h3><p>유효 die만 분모로 사용해 wafer·lot 수율을 계산</p></article>
+          <article><span class="step-no">02–03</span><h3>공간 확인</h3><p>원본 map 시각화, 4방향 이웃 Moran's I 계산</p></article>
+          <article><span class="step-no">04–05</span><h3>특징·군집</h3><p>반경·사분면·연결 성분 특징과 밀도 군집 비교</p></article>
+          <article><span class="step-no">06–07</span><h3>분류·OOD</h3><p>lot 분할 테스트와 보류 결함 유형 탐지 평가</p></article>
+        </div>
+        <div class="method-bar"><span class="method-icon" aria-hidden="true">✓</span><p><strong>평가 설계</strong> 동일 lot의 wafer가 train / validation / test에 섞이지 않도록 분할했습니다. 분할 간 완전히 동일한 원본 map 38장은 분류 평가에서 제거했습니다.</p></div>
+      </div>
+    </section>
+
+    <section id="results" class="section results-section">
+      <div class="wrap">
+        <div class="section-heading"><div><p class="section-kicker">02 / EVIDENCE</p><h2>숫자로 확인한 성과와 한계</h2></div><p>결함 8종의 동일한 test 3,637장에 대해 수율 단독, 공간 특징, CNN을 비교했습니다.</p></div>
+        <div class="result-grid">
+          <div class="result-main card">
+            <div class="card-topline"><span>KNOWN-CLASS CLASSIFICATION</span><span>MACRO-F1 ↑</span></div>
+            <h3>수율보다 공간 정보가 유용했습니다.</h3>
+            <p>다만 이 실험에서는 공간 특징을 사용한 기준선이 CNN보다 높았습니다.</p>
+            <div class="bar-list" role="img" aria-label="수율만 0.318, 공간 특징 0.755, CNN 웨이퍼 맵 0.734의 테스트 macro-F1 비교">
+              <div class="bar-row"><span>수율만</span><div class="bar-track"><i style="width:31.8%"></i></div><strong>0.318</strong></div>
+              <div class="bar-row"><span>공간 특징</span><div class="bar-track"><i class="bar-highlight" style="width:75.5%"></i></div><strong>0.755</strong></div>
+              <div class="bar-row"><span>CNN map</span><div class="bar-track"><i class="bar-cnn" style="width:73.4%"></i></div><strong>0.734</strong></div>
+            </div>
+            <p class="micro">결함 유형 8종, <code>none</code>·미라벨 제외 · 같은 lot 분할 · 테스트 데이터로 모델 설정을 고르지 않음</p>
+          </div>
+          <div class="result-side">
+            <div class="metric-card dark-card"><span class="metric-label">NOVELTY DETECTION</span><strong>0.780</strong><span>보류 유형 OOD 평균 AUROC</span><p>Mahalanobis 거리 기반 · 8종을 하나씩 학습에서 제외</p></div>
+            <div class="metric-card warning-card"><span class="metric-label">실제 경보 기준</span><strong>36.5<span>%</span></strong><span>보류 유형 평균 탐지율</span><p>알려진 유형 오경보율 4.3%. AUROC만으로 운영 가능성을 판단할 수 없습니다.</p></div>
+          </div>
+        </div>
+        <div class="finding-strip"><div><span class="finding-index">01</span><p>HDBSCAN 표본에서 라벨 결함 <strong>360장 중 341장</strong>이 noise였습니다.</p></div><div><span class="finding-index">02</span><p><code>Edge-Ring</code> OOD 탐지율은 <strong>0.5%</strong>, <code>Scratch</code>는 <strong>0%</strong>였습니다.</p></div></div>
+      </div>
+    </section>
+
+    <section id="cases" class="section section-light cases-section">
+      <div class="wrap">
+        <div class="section-heading"><div><p class="section-kicker">03 / CASE NOTES</p><h2>모델 출력에서 검토 질문으로</h2></div><p>Wafer map은 원인 진단서가 아닙니다. 관찰과 추가 확인 항목을 분리했습니다.</p></div>
+        <div class="case-grid">
+          <article class="case-card"><div class="case-image"><img src="./assets/step2_lot_sequence.png" alt="lot8392의 wafer별 수율과 bin map: 한 wafer만 급격히 낮은 수율" loading="lazy"></div><div class="case-content"><span class="case-tag">LOT-LEVEL ANOMALY</span><h3>같은 lot, 한 wafer의 급락</h3><p>lot8392 wafer 12의 수율은 <strong>0.17%</strong>. 그림에 선정된 다른 11장의 중앙값은 <strong>98.59%</strong>입니다.</p><p class="case-next"><b>다음 확인</b> 재측정 여부, wafer 순서, 장비·챔버·공정 시간 이력</p></div></article>
+          <article class="case-card"><div class="case-image"><img src="./assets/step6_error_gallery.png" alt="CNN이 Edge-Ring을 Edge-Loc으로 분류한 실제 오분류 웨이퍼 맵 모음" loading="lazy"></div><div class="case-content"><span class="case-tag">MODEL ERROR</span><h3>가장자리 패턴의 혼동</h3><p>CNN이 일부 <strong>Edge-Ring → Edge-Loc</strong> 사례를 높은 확신으로 잘못 분류했습니다.</p><p class="case-next"><b>다음 확인</b> 둘레 연속성, 각도 범위, 라벨 판정 기준 재검토</p></div></article>
+          <article class="case-card"><div class="case-image"><img src="./assets/step7_ood_cases.png" alt="보류 결함 유형 Near-full과 Edge-Loc의 높은 점수·낮은 점수 사례 비교" loading="lazy"></div><div class="case-content"><span class="case-tag">UNKNOWN PATTERNS</span><h3>탐지되는 유형과 놓치는 유형</h3><p>Near-full은 소수 test 17장을 모두 탐지했지만, Edge-Loc의 보류 유형 탐지율은 <strong>8.5%</strong>였습니다.</p><p class="case-next"><b>다음 확인</b> 기존 클래스와의 특징 중첩, 정상 wafer 오경보</p></div></article>
+        </div>
+        <a class="text-link" href="https://github.com/ChangJunPark-gif/Semiconductor/blob/main/reports/portfolio_case_cards.md" target="_blank" rel="noopener noreferrer">근거와 한계를 담은 사례 카드 전체 보기 <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <section id="limits" class="section limits-section"><div class="wrap limits-grid"><div><p class="section-kicker">04 / ENGINEERING JUDGMENT</p><h2>패턴은 신호이고,<br>원인은 검증 대상입니다.</h2><p>이 공개 데이터에는 장비·레시피·공정 계측·시간 정보가 없습니다. 따라서 어떤 장비가 불량을 만들었는지, AI가 수율을 개선했는지 주장하지 않습니다.</p></div><div class="limits-panel"><h3>현장 적용 전 필요한 연결</h3><ul><li><span>01</span> 측정·bin 코드 및 재측정 결과 확인</li><li><span>02</span> lot·wafer 순서와 장비·챔버 이력 연결</li><li><span>03</span> 공정 계측값과 결함 위치 대조</li><li><span>04</span> 다른 시점·라인에서 성능 재검증</li></ul></div></div></section>
+
+    <section class="cta-section"><div class="wrap cta-inner"><div><p class="section-kicker">REPRODUCIBLE BY DESIGN</p><h2>코드, 수치, 실패 사례를<br>함께 공개했습니다.</h2><p>단계별 보고서와 재현 명령은 GitHub 저장소에 있습니다. 원본 대용량 데이터와 모델 캐시는 저장소에 포함하지 않았습니다.</p></div><div class="cta-actions"><a class="button button-primary" href="https://github.com/ChangJunPark-gif/Semiconductor" target="_blank" rel="noopener noreferrer">GitHub 저장소 보기 ↗</a><a class="button button-ghost" href="https://github.com/ChangJunPark-gif/Semiconductor/blob/main/PRESENTATION.md" target="_blank" rel="noopener noreferrer">발표 구성 보기 ↗</a></div></div></section>
+  </main>
+
+  <footer class="site-footer"><div class="wrap footer-inner"><span>WAFER/SIGNAL · Semiconductor Yield Analysis</span><span>Public WM-811K research portfolio · <a href="https://github.com/ChangJunPark-gif/Semiconductor" target="_blank" rel="noopener noreferrer">Source on GitHub ↗</a></span></div></footer>
+  <script src="./script.js" defer></script>
+</body>
+</html>
